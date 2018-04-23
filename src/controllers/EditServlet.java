@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
@@ -15,16 +14,16 @@ import models.Task;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class IndexServlet
+ * Servlet implementation class EditServlet
  */
-@WebServlet("/index")
-public class IndexServlet extends HttpServlet {
+@WebServlet("/edit")
+public class EditServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public IndexServlet() {
+    public EditServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -36,20 +35,15 @@ public class IndexServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		EntityManager em = DBUtil.createEntityManager();
 
-		List<Task> taskList = em.createNamedQuery("getAllTasks",Task.class).getResultList();
-		long taskCount = em.createNamedQuery("getTaskCount",Long.class).getSingleResult();
+		Task t = em.find(Task.class, Integer.parseInt((String)request.getParameter("id")));
 
 		em.close();
 
-		request.setAttribute("tasklist", taskList);
-		request.setAttribute("taskCount", taskCount);
+		request.setAttribute("task", t);
+		request.setAttribute("_token", request.getSession().getId());
+        request.getSession().setAttribute("task_id", t.getId());
 
-		if(request.getSession().getAttribute("flush") != null) {
-		    request.setAttribute("flush", request.getSession().getAttribute("flush"));
-		    request.getSession().removeAttribute("flush");
-		}
-
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/messages/index.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/messages/edit.jsp");
         rd.forward(request, response);
 	}
 
